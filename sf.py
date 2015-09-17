@@ -230,17 +230,17 @@ class Park:
 					res[r]=1;
 		return res.keys();
 
-	def totalScore(self):
+	def totalPrice(self):
 		names=self.allHouseNames();
-		score=0;
+		price=0;
 		for n in names:
-			score+=10; # 10 points per house
+			price+=10; # 10 points per house
 			(t,l,b,r) = self.getHouseCoors(n);
 			# plus 1 per covered square
 			height=(b-t)+1;
 			width=(r-l)+1;
-			score+=(height*width);
-		return score;
+			price+=(height*width);
+		return price;
 
 	def splitAndRemove(self,hname,split_type,con_corner):
 		'''
@@ -645,7 +645,6 @@ class Park:
 #      max # of houses, then select always new park
 #    * if variation is positive, select the park with the smallest variation
 #    * of the remaining, select park with lowest price
-# if more than one new park is selected, one with lowest score is chosen
 #
 # c) if the park selected in (b) has a lower price than the current
 #    park, then it is selected as the current and the program returns
@@ -713,11 +712,11 @@ class InputProcessor:
 				if (debug_print): sys.stdout.write("\nStarting round {0}\n".format(round));
 
 				cur_num_houses = len(p.allHouseNames());
-				cur_score = p.totalScore();
+				cur_price = p.totalPrice();
 				if (debug_print): print "*****************";
 				if (debug_print): p.display();
 				if (debug_print): print "CUR: # of houses:",cur_num_houses;
-				if (debug_print): print "CUR: price:",cur_score;
+				if (debug_print): print "CUR: price:",cur_price;
 
 				# generate list of greenhouses to combine
 				# NOTE: the loop only does MAX_COMBINES number of
@@ -727,8 +726,8 @@ class InputProcessor:
 				selected=[];
 
 				min_variation=sys.maxint;
-				min_score=sys.maxint;
-				min_score_l=[];
+				min_price=sys.maxint;
+				min_price_l=[];
 
 				for cmb in clist:
 					if (i>=MAX_COMBINES): break;
@@ -745,10 +744,10 @@ class InputProcessor:
 
 					for np in new_park_list:
 						num_houses = len(np.allHouseNames());
-						score = np.totalScore();
+						price = np.totalPrice();
 
 						if (debug_print): print "# of houses:",num_houses;
-						if (debug_print): print "price:",score;
+						if (debug_print): print "price:",price;
 
 						variation=num_houses-cur_num_houses;
 
@@ -773,36 +772,38 @@ class InputProcessor:
 								selected.append(np);
 						#}
 
-						# also select those with the lowest score
+						# also select those with the lowest price
 						# NOTE: ignored because it always selects the
 						# single house to cover all the strawberries
 						# FIXME: if true, this seems like a bug
-						#if (score<min_score):
-						#	min_score_l=[];
-						#	min_score_l.append(np);
-						#	min_score=score;
-						#elif (score==min_score):
-						#	min_score_l.append(np);
+						#if (price<min_price):
+						#	min_price_l=[];
+						#	min_price_l.append(np);
+						#	min_price=price;
+						#elif (price==min_price):
+						#	min_price_l.append(np);
 
 				if (debug_print): print "min_var",min_variation;
-				if (debug_print): print "min_score",min_score;
+				if (debug_print): print "min_price",min_price;
 				if (debug_print): print "total selected: ",len(selected);
 
-				# append the min_score list to the selected list.
-				# This will weight lower scores higher in probability.
-				selected.extend(min_score_l);
+				# append the min_price list to the selected list.
+				# This will weight lower prices higher in probability.
+				selected.extend(min_price_l);
 
 				# pick the next candidate from the selection list
-				# with the lowest score
+				# with the lowest price
 				MAX_SCORE_SEARCH = 16;
 				selidx=-1;
-				min_score=sys.maxint;
+				min_price=sys.maxint;
 				for i in range(len(selected)):
-					if (selected[i].totalScore()<min_score): selidx=i;
+					if (selected[i].totalPrice()<min_price): selidx=i;
+
+
 
 				candidate=selected[selidx];
 				num_houses=len(candidate.allHouseNames());
-				score=candidate.totalScore();
+				price=candidate.totalPrice();
 
 				# if we need to reduce houses, then choose
 				# it and goto next round
@@ -812,8 +813,8 @@ class InputProcessor:
 				):
 					p=candidate;
 				elif (
-					(cur_score>score) or
-					((cur_score==score) and (num_houses<cur_num_houses))
+					(cur_price>price) or
+					((cur_price==price) and (num_houses<cur_num_houses))
 				):
 					p=candidate;
 				else:
@@ -823,7 +824,7 @@ class InputProcessor:
 
 			if (debug_print): sys.stdout.write("\n\nprocessing finished in round {0}\n".format(round));
 			if (debug_print): print "SOLUTION:";
-			print p.totalScore();
+			print p.totalPrice();
 			p.display();
 
 			grid_index+=1;
