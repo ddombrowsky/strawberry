@@ -811,13 +811,19 @@ class InputProcessor:
 							selected.append(np);
 						#}
 
-						# also select those with the lowest price
-						if (price<min_price):
-							min_price_l=[];
-							min_price_l.append(np);
-							min_price=price;
-						elif (price==min_price):
-							min_price_l.append(np);
+						# In later rounds, also select those with
+						# the lowest price.  If we included this
+						# in early rounds, it would most often select
+						# one house over all berries and iteration
+						# would stop.
+						if (round>10): #{
+							if (price<min_price):
+								min_price_l=[];
+								min_price_l.append(np);
+								min_price=price;
+							elif (price==min_price):
+								min_price_l.append(np);
+						#}
 					#}
 				#}
 
