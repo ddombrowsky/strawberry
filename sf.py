@@ -452,7 +452,6 @@ class Park:
 		# additional options if it needed to split,
 		# including itself
 		new_parks = res.reduce(newhouse);
-		new_parks.append(res);
 
 		return new_parks;
 		
