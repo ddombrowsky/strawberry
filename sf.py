@@ -685,7 +685,9 @@ class InputProcessor:
 			rows=len(self.data_array[grid_index]);
 			cols=len(self.data_array[grid_index][0]);
 
-			if (debug_print): print "creating new park with (rows,cols) = (",rows,",",cols,")";
+			if (debug_print):
+				print("creating new park with (rows,cols) = ({0},{1})".
+				      format(rows,cols));
 			p=Park(rows,cols);
 
 			# load the park object with the input data
@@ -728,7 +730,8 @@ class InputProcessor:
 			round=0;
 			while (not solution_found):
 				round+=1;
-				if (debug_print): sys.stdout.write("\nStarting round {0}\n".format(round));
+				if (debug_print):
+					sys.stdout.write("\nStarting round {0}\n".format(round));
 
 				cur_num_houses = len(p.allHouseNames());
 				cur_price = p.totalPrice();
@@ -748,10 +751,13 @@ class InputProcessor:
 				min_price=sys.maxint;
 				min_price_l=[];
 
-				for cmb in clist:
+				for cmb in clist: #{
 					if (i>=MAX_COMBINES): break;
 
-					if (debug_print): sys.stdout.write("\ntesting combination {0}".format(i));
+					if (debug_print):
+						sys.stdout.write("\ntesting combination #{0}\n".
+						                 format(i));
+
 					i+=1;
 
 					(gh1,gh2) = cmb;
@@ -761,7 +767,7 @@ class InputProcessor:
 					# except the two we just combined
 					new_park_list=p.combineAndReduce(gh1,gh2);
 
-					for np in new_park_list:
+					for np in new_park_list: #{
 						num_houses = len(np.allHouseNames());
 						price = np.totalPrice();
 
@@ -801,6 +807,8 @@ class InputProcessor:
 						#	min_price=price;
 						#elif (price==min_price):
 						#	min_price_l.append(np);
+					#}
+				#}
 
 				if (debug_print): print "min_var",min_variation;
 				if (debug_print): print "min_price",min_price;
@@ -810,6 +818,8 @@ class InputProcessor:
 				# This will weight lower prices higher in probability.
 				selected.extend(min_price_l);
 
+				assert(len(selected) > 0);
+
 				# pick the next candidate from the selection list
 				# with the lowest price
 				MAX_SCORE_SEARCH = 16;
@@ -817,8 +827,6 @@ class InputProcessor:
 				min_price=sys.maxint;
 				for i in range(len(selected)):
 					if (selected[i].totalPrice()<min_price): selidx=i;
-
-
 
 				candidate=selected[selidx];
 				num_houses=len(candidate.allHouseNames());
@@ -841,8 +849,10 @@ class InputProcessor:
 					# we select the current as the solution
 					solution_found=True;
 
-			if (debug_print): sys.stdout.write("\n\nprocessing finished in round {0}\n".format(round));
-			if (debug_print): print "SOLUTION:";
+			if (debug_print):
+				sys.stdout.write("\n\nprocessing finished in round {0}\n".
+				                 format(round));
+				print "SOLUTION:";
 			print p.totalPrice();
 			p.display();
 
