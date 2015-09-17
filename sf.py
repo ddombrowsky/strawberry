@@ -770,42 +770,45 @@ class InputProcessor:
 						num_houses = len(np.allHouseNames());
 						price = np.totalPrice();
 
-						if (debug_print): print "# of houses:",num_houses;
-						if (debug_print): print "price:",price;
-
 						variation=num_houses-cur_num_houses;
+
+						if (debug_print):
+							print "# of houses:",num_houses;
+							print "price:",price;
+							print "house count variation:",variation;
 
 						# if the number of greenhouses went down, and
 						# we have too many in the current one, then
 						# select only if variation is -1.  otherwise,
 						# take the one with the smallest absolute
 						# variation.
-						if (cur_num_houses>max_gh_count):
-							if (variation==-1): selected.append(np);
-						else: #{
-							v=abs(variation);
-
-							# variation of 0 and 1 are considered equal
-							if (v==0): v=1;
-
-							if (v<min_variation):
-								selected=[];
+						if (cur_num_houses>max_gh_count): #{
+							if (variation==-1):
 								selected.append(np);
-								min_variation=v;
-							elif (v==min_variation):
-								selected.append(np);
+							else: #{
+								v=abs(variation);
+
+								# variation of 0 and 1 are considered equal
+								if (v==0): v=1;
+
+								if (v<min_variation):
+									# found a new minimum, blank
+									# the list and start over
+									selected=[];
+									selected.append(np);
+									min_variation=v;
+								elif (v==min_variation):
+									selected.append(np);
+							#}
 						#}
 
 						# also select those with the lowest price
-						# NOTE: ignored because it always selects the
-						# single house to cover all the strawberries
-						# FIXME: if true, this seems like a bug
-						#if (price<min_price):
-						#	min_price_l=[];
-						#	min_price_l.append(np);
-						#	min_price=price;
-						#elif (price==min_price):
-						#	min_price_l.append(np);
+						if (price<min_price):
+							min_price_l=[];
+							min_price_l.append(np);
+							min_price=price;
+						elif (price==min_price):
+							min_price_l.append(np);
 					#}
 				#}
 
