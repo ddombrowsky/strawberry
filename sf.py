@@ -111,6 +111,7 @@ class ParkSquare:
 	'''
 	def __init__(self):
 		self.occ_list = [];
+		self.has_berry = False;
 
 	def append(self,n):
 		self.occ_list.append(n);
@@ -123,27 +124,23 @@ class ParkSquare:
 			print "." on empty, the value on single, and "X" on multiple
 		'''
 		if (self.empty()):
-			return ".";
+			ch=".";
+			if (self.has_berry): ch="@";
+			return ch;
 		elif (len(self.occ_list)==1):
 			# square is occupied by only 1 item,
-			# so display it as @ (strawberry) or
-			# with the ascii house ID.
-			if (self.occ_list[0]=='@'):
-				ch='@';
-			else: #{
-				m=re.match("[0-9]+",self.occ_list[0]);
-				if (m!=None):
-					num=int(m.group());
-					if (num<(126-33)): # max ascii
-						ch=chr(ord('!')+num);
-					else:
+			# so display with the ascii house ID.
+			ch="~";
+			m=re.match("[0-9]+",self.occ_list[0]);
+			if (m!=None):
+				num=int(m.group());
+				if (num<(126-33)): # max ascii
+					ch=chr(ord('!')+num);
+					if ((ch==".") or (ch=="@")): # reserved
 						ch="~";
-				else: #{
-					ch="~";
-				#}
-			#}
 			return ch;
 		else:
+			# conflict
 			return "X";
 
 class Park:
@@ -165,6 +162,7 @@ class Park:
 		for i in range(len(other_park.grid)):
 			for j in range(len(other_park.grid[i])):
 				self.grid[i][j].occ_list.extend(other_park.grid[i][j].occ_list);
+				self.grid[i][j].has_berry=other_park.grid[i][j].has_berry;
 
 
 	def display(self):
@@ -701,7 +699,7 @@ class InputProcessor:
 				k=0;
 				for c in row:
 					if (c=='@'):
-						p.grid[j][k].append(c);
+						p.grid[j][k].has_berry = True;
 					k+=1;
 				j+=1;
 
@@ -718,9 +716,8 @@ class InputProcessor:
 			for row in self.data_array[grid_index]: #{
 				k=0;
 				for c in row: #{
-					if ((len(p.grid[j][k].occ_list)>0) and
-					   (p.grid[j][k].occ_list[0]=='@')): #{
-						p.grid[j][k].occ_list[0]="{0}".format(gh_num);
+					if (p.grid[j][k].has_berry): #{
+						p.grid[j][k].occ_list.append("{0}".format(gh_num));
 						gh_num+=1;
 					#}
 					k+=1;
