@@ -1,6 +1,7 @@
 Original description of problem:
 
 http://www.itasoftware.com/careers/jlisting.html?uid=700679
+https://web.archive.org/web/20130821070911/http://www.itasoftware.com/careers/puzzle_archive.html
 
 Strawberry Fields
 
