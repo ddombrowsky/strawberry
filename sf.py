@@ -800,6 +800,11 @@ class InputProcessor:
 								elif (v==min_variation):
 									selected.append(np);
 							#}
+						else:
+							# We're at or below the max number of
+							# houses.  Keep this configuration
+							# by default.
+							selected.append(np);
 						#}
 
 						# also select those with the lowest price
