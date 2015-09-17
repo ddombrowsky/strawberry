@@ -119,11 +119,30 @@ class ParkSquare:
 			print "." on empty, the value on single, and "X" on multiple
 		'''
 		if (self.empty()):
-			return " . ";
+			return ".";
 		elif (len(self.occ_list)==1):
-			return "{0:3}".format(self.occ_list[0]);
+			# square is occupied by only 1 item,
+			# so display it as @ (strawberry) or
+			# with the ascii house ID.
+			if (self.occ_list[0]=='@'):
+				ch='@';
+			else: #{
+				m=re.match("[0-9]+",self.occ_list[0]);
+				if (m!=None):
+					num=int(m.group());
+					if (num<10):
+						ch=self.occ_list[0][0];
+					elif (num<(126-33+10)): # max ascii
+						ch=chr(ord('!')+(num-10));
+					else:
+						ch="~";
+				else: #{
+					ch="~";
+				#}
+			#}
+			return ch;
 		else:
-			return " X ";
+			return "X";
 
 class Park:
 	'''
