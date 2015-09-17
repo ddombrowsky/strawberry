@@ -710,7 +710,7 @@ class InputProcessor:
 			round=0;
 			while (not solution_found):
 				round+=1;
-				if (debug_print): sys.stderr.write("\nStarting round {0}\n".format(round));
+				if (debug_print): sys.stdout.write("\nStarting round {0}\n".format(round));
 
 				cur_num_houses = len(p.allHouseNames());
 				cur_score = p.totalScore();
@@ -733,7 +733,7 @@ class InputProcessor:
 				for cmb in clist:
 					if (i>=MAX_COMBINES): break;
 
-					if (debug_print): sys.stderr.write("\rtesting combination {0}".format(i));
+					if (debug_print): sys.stdout.write("\ntesting combination {0}".format(i));
 					i+=1;
 
 					(gh1,gh2) = cmb;
@@ -821,7 +821,7 @@ class InputProcessor:
 					# we select the current as the solution
 					solution_found=True;
 
-			if (debug_print): sys.stderr.write("\n\nprocessing finished in round {0}\n".format(round));
+			if (debug_print): sys.stdout.write("\n\nprocessing finished in round {0}\n".format(round));
 			if (debug_print): print "SOLUTION:";
 			print p.totalScore();
 			p.display();
