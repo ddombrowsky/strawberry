@@ -15,7 +15,7 @@
 import sys,re,random;
 
 debug_print=False;
-MAX_COMBINES=1024;
+MAX_COMBINES=1000;
 
 class InputReader:
 	def __init__(self):
@@ -678,13 +678,16 @@ class Park:
 
 class InputProcessor:
 	def __init__(self,max_array,data_array):
+		# FIXME: this should not take multiple problems at once
 		self.max_array = max_array;
 		self.data_array = data_array;
+		self.best = None;
 
-	def do_run(self):
+	def do_single_run(self):
 		print "\n";
 		grid_index=0;
-		for max_gh_count in self.max_array:
+		p=None;
+		for max_gh_count in self.max_array: #{
 			rows=len(self.data_array[grid_index]);
 			cols=len(self.data_array[grid_index][0]);
 
@@ -733,8 +736,8 @@ class InputProcessor:
 			round=0;
 			while (not solution_found):
 				round+=1;
-				if (debug_print):
-					sys.stdout.write("\nStarting round {0}\n".format(round));
+
+				print("Starting round {0}".format(round));
 
 				cur_num_houses = len(p.allHouseNames());
 				cur_price = p.totalPrice();
@@ -827,9 +830,12 @@ class InputProcessor:
 					#}
 				#}
 
-				if (debug_print): print "min_var",min_variation;
-				if (debug_print): print "min_price",min_price;
-				if (debug_print): print "total selected: ",len(selected);
+				if (debug_print):
+					print "min_var",min_variation;
+					print "min_price",min_price;
+
+				print("Selecting best price of {0} configurations".
+				      format(len(selected)));
 
 				# append the min_price list to the selected list.
 				# This will weight lower prices higher in probability.
@@ -874,8 +880,46 @@ class InputProcessor:
 			p.display();
 
 			grid_index+=1;
+		#}
 
+		self.best = p;
 		print "done";
+
+	def do_run(self):
+		best_overall=None;
+		done=False;
+
+		# Number of times we will try to beat our current best
+		# before accepting the solution:
+		retry=4;
+
+		while (not done): #{
+			self.do_single_run();
+			if (best_overall==None or
+			    self.best.totalPrice() < best_overall.totalPrice()):
+
+				if (best_overall!=None):
+					prevbest=best_overall.totalPrice();
+				else:
+					prevbest=-1;
+
+				best_overall=self.best;
+
+				print("NEW BEST: price down from {0} to {1}".
+				      format(prevbest,
+					         best_overall.totalPrice()));
+			else: #{
+				retry-=1;
+				print("can't beat previous best of {0}, retries {1}".
+				      format(best_overall.totalPrice(),retry));
+			#}
+
+			if (retry<=0): done=True;
+
+			best_overall.display();
+			print("\n------------------------------");
+		#}
+
 
 
 print "Starting...";
