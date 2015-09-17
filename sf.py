@@ -134,10 +134,8 @@ class ParkSquare:
 				m=re.match("[0-9]+",self.occ_list[0]);
 				if (m!=None):
 					num=int(m.group());
-					if (num<10):
-						ch=self.occ_list[0][0];
-					elif (num<(126-33+10)): # max ascii
-						ch=chr(ord('!')+(num-10));
+					if (num<(126-33)): # max ascii
+						ch=chr(ord('!')+num);
 					else:
 						ch="~";
 				else: #{
