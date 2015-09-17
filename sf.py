@@ -1,6 +1,10 @@
 #!/usr/bin/python
 #
-# see the README.txt file for description of the excercise
+# Copyright 2015, David Dombrowsky & 6th Street Software
+#
+# Distributed under GPLv2.  See LICENSE file for details.
+#
+# See the README.txt file for description of the excercise.
 
 # usage:
 # $ cat rectangles.txt | ./sf.py
