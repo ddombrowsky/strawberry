@@ -15,7 +15,8 @@
 import sys,re,random;
 
 debug_print=False;
-MAX_COMBINES=1000;
+MAX_COMBINES=1000; # num of combinations to try each round
+MAX_RETRIES=10; # number of times try to beat the best solution
 
 class InputReader:
 	def __init__(self):
@@ -920,7 +921,6 @@ class InputProcessor:
 
 				# pick the next candidate from the selection list
 				# with the lowest price
-				MAX_SCORE_SEARCH = 16;
 				selidx=-1;
 				min_price=sys.maxint;
 				for i in range(len(selected)):
@@ -966,7 +966,7 @@ class InputProcessor:
 
 		# Number of times we will try to beat our current best
 		# before accepting the solution:
-		retry=4;
+		retry=MAX_RETRIES;
 
 		while (not done): #{
 			self.do_single_run();
@@ -983,6 +983,8 @@ class InputProcessor:
 				print("NEW BEST: price down from {0} to {1}".
 				      format(prevbest,
 					         best_overall.totalPrice()));
+
+				retry=MAX_RETRIES;
 			else: #{
 				retry-=1;
 				print("can't beat previous best of {0}, retries {1}".
