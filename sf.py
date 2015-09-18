@@ -622,7 +622,6 @@ class Park:
 				(cur_b< new_b)
 			):
 				if (debug_print): print "SPLIT (horizontal)";
-				self.deleteHouse(s);
 
 				# new left side
 				for i in range(cur_t,cur_b+1):
@@ -631,8 +630,11 @@ class Park:
 
 				# new right side
 				for i in range(cur_t,cur_b+1):
-					for j in range(new_r+1,cur_r):
+					for j in range(new_r+1,cur_r+1):
 						self.grid[i][j].occ_list.append(s+"z");
+
+				if (debug_print): self.display();
+				self.deleteHouse(s);
 
 				continue;
 
@@ -643,17 +645,19 @@ class Park:
 				(cur_b>=new_b)
 			):
 				if (debug_print): print "SPLIT (vertical)";
-				self.deleteHouse(s);
 
 				# new top side
 				for i in range(cur_t,new_t):
-					for j in range(cur_l,new_l):
+					for j in range(cur_l,cur_r+1):
 						self.grid[i][j].occ_list.append(s+"y");
 
 				# new bottom
-				for i in range(new_t+1,cur_b+1):
-					for j in range(new_l+1,cur_r):
+				for i in range(new_b+1,cur_b+1):
+					for j in range(cur_l,cur_r+1):
 						self.grid[i][j].occ_list.append(s+"z");
+
+				if (debug_print): self.display();
+				self.deleteHouse(s);
 
 				continue;
 
