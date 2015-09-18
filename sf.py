@@ -12,7 +12,7 @@
 # To see details, set debug_print to True (in the source code) and run
 # $ cat rectangles.txt | ./sf.py > rectangles.out
 
-import sys,re,random;
+import sys, re, random;
 
 debug_print=False;
 MAX_COMBINES=1000; # num of combinations to try each round
@@ -27,9 +27,9 @@ class InputReader:
 		num=0;
 		grid = [];
 
-		def procgrid(max,num,grid): #{
+		def procgrid(max, num, grid): #{
 
-			if (debug_print): print "max greenhouses:",max,", grid #",num;
+			if (debug_print): print "max greenhouses:", max, ", grid #", num;
 
 			if (len(grid)>0):
 				self.ar_data.append(grid);
@@ -55,7 +55,7 @@ class InputReader:
 			r=r.rstrip(); # remove newline
 
 			if (len(r)>0): # skip blank lines
-				rm=re.match('[0-9]+',r);
+				rm=re.match('[0-9]+', r);
 				if (rm is None):
 					if (state==0):
 						print "invalid number";
@@ -78,7 +78,7 @@ class InputReader:
 
 					# only limited #s are allows
 					if (not ((r>=1) and (r<=10))):
-						print "number out of range:",r;
+						print "number out of range:", r;
 						continue;
 
 					# store the max # of greenhouses
@@ -104,7 +104,7 @@ class InputReader:
 			);
 		#}
 
-		return (self.ar_max_greenhouses,self.ar_data);
+		return (self.ar_max_greenhouses, self.ar_data);
 
 class ParkSquare:
 	'''
@@ -114,7 +114,7 @@ class ParkSquare:
 		self.occ_list = [];
 		self.has_berry = False;
 
-	def append(self,n):
+	def append(self, n):
 		self.occ_list.append(n);
 
 	def empty(self):
@@ -132,7 +132,7 @@ class ParkSquare:
 			# square is occupied by only 1 item,
 			# so display with the ascii house ID.
 			ch="~";
-			m=re.match("[0-9]+",self.occ_list[0]);
+			m=re.match("[0-9]+", self.occ_list[0]);
 			if (m!=None):
 				num=int(m.group());
 				if (num<(126-33)): # max ascii
@@ -153,7 +153,7 @@ class Park:
 	'''
 		represents a park
 	'''
-	def __init__(self,rows,cols):
+	def __init__(self, rows, cols):
 		self.rows = rows;
 		self.cols = cols;
 		self.grid=[];
@@ -162,7 +162,7 @@ class Park:
 			for j in range(cols):
 				self.grid[i].append(ParkSquare());
 
-	def copyFrom(self,other_park):
+	def copyFrom(self, other_park):
 		# NOTE: this object must have been created with the
 		# same size parameters.
 		for i in range(len(other_park.grid)):
@@ -181,11 +181,11 @@ class Park:
 				sys.stdout.write(self.grid[i][j].toString());
 			print;
 
-	def getHouseCoors(self,hname):
+	def getHouseCoors(self, hname):
 		'''
 			return a set containing the house
 			coordinates in the format
-			(top,left,bottom,right)
+			(top, left, bottom, right)
 		'''
 		top=len(self.grid);
 		left=len(self.grid[0]);
@@ -205,7 +205,7 @@ class Park:
 					if (j>right): right=j;
 				j+=1;
 			i+=1;
-		return (top,left,bottom,right);
+		return (top, left, bottom, right);
 
 	def randomizeComboList(self):
 		'''
@@ -221,23 +221,23 @@ class Park:
 		# return an illogical answer and the
 		# processing loop will exit.
 		if (len(houses)==1):
-			combolist.append((houses[0],houses[0]));
+			combolist.append((houses[0], houses[0]));
 		else:
 			for a in houses:
 				for b in houses:
-					if (a!=b): combolist.append((a,b));
+					if (a!=b): combolist.append((a, b));
 
 			# shuffle the list
 			for i in range(10000):
-				n1=random.randint(0,len(combolist)-1);
-				n2=random.randint(0,len(combolist)-1);
+				n1=random.randint(0, len(combolist)-1);
+				n2=random.randint(0, len(combolist)-1);
 				a = combolist[n1];
 				combolist[n1] = combolist[n2];
 				combolist[n2] = a;
 
 		return combolist;
 
-	def deleteHouse(self,hname):
+	def deleteHouse(self, hname):
 		'''
 			remove a house from the park
 		'''
@@ -262,14 +262,14 @@ class Park:
 		price=0;
 		for n in names:
 			price+=10; # 10 points per house
-			(t,l,b,r) = self.getHouseCoors(n);
+			(t, l, b, r) = self.getHouseCoors(n);
 			# plus 1 per covered square
 			height=(b-t)+1;
 			width=(r-l)+1;
 			price+=(height*width);
 		return price;
 
-	def splitAndRemove(self,hname,split_type,con_corner):
+	def splitAndRemove(self, hname, split_type, con_corner):
 		'''
 			remove house <hname> where it conflicts
 			with any other house, and split the
@@ -285,14 +285,14 @@ class Park:
 		sname=[];
 		sname.append(hname+"a");
 		sname.append(hname+"b");
-		(cur_t,cur_l,cur_b,cur_r)=self.getHouseCoors(hname);
+		(cur_t, cur_l, cur_b, cur_r)=self.getHouseCoors(hname);
 		conf_t=cur_b;
 		conf_l=cur_r;
 		conf_b=cur_t;
 		conf_r=cur_l;
 
-		for i in range(cur_t,cur_b+1):
-			for j in range(cur_l,cur_r+1):
+		for i in range(cur_t, cur_b+1):
+			for j in range(cur_l, cur_r+1):
 				if (len(self.grid[i][j].occ_list)>1):
 					# store the conflicting coordinates
 					if (i<conf_t): conf_t=i;
@@ -300,16 +300,16 @@ class Park:
 					if (i>conf_b): conf_b=i;
 					if (j>conf_r): conf_r=j;
 
-		if (debug_print): print "conflict",(conf_t,conf_l,conf_b,conf_r);
+		if (debug_print): print "conflict", (conf_t, conf_l, conf_b, conf_r);
 
 		# for empty blocks previously occupied
 		# by the conflicting house, place one
 		# of two new houses based on the split type
 		# and the conflicting corner
-		new_t=[0,0];
-		new_l=[0,0];
-		new_b=[0,0];
-		new_r=[0,0];
+		new_t=[0, 0];
+		new_l=[0, 0];
+		new_b=[0, 0];
+		new_r=[0, 0];
 		if (con_corner==1):
 			# A is existing (to be split), B is new
 
@@ -452,11 +452,11 @@ class Park:
 		# create the two new houses
 		for n in range(2):
 			if (debug_print):
-				print("New house, {0},{1} to {2},{3}".
-				      format(new_t[n],new_l[n],new_b[n]+1,new_r[n]+1));
+				print("New house, {0}, {1} to {2}, {3}".
+				      format(new_t[n], new_l[n], new_b[n]+1, new_r[n]+1));
 
-			for i in range(new_t[n],new_b[n]+1):
-				for j in range(new_l[n],new_r[n]+1):
+			for i in range(new_t[n], new_b[n]+1):
+				for j in range(new_l[n], new_r[n]+1):
 					if (len(self.grid[i][j].occ_list)>1):
 						sys.stderr.write("ERROR: attempting to add conflict\n");
 						sys.exit(-1);
@@ -470,7 +470,7 @@ class Park:
 		self.deleteHouse(hname);
 
 
-	def combineAndReduce(self,gh1,gh2):
+	def combineAndReduce(self, gh1, gh2):
 		'''
 			combine two greenhouses together, and
 			subtract the overlap from the remaining
@@ -480,10 +480,10 @@ class Park:
 		'''
 		# NOTE: this function returns a new park
 		# and does not affect itself
-		res=Park(self.rows,self.cols);
+		res=Park(self.rows, self.cols);
 		res.copyFrom(self);
 
-		# find the maximum area top-left,bottom-right
+		# find the maximum area top-left, bottom-right
 		# coordinates from the greenhouse numbers given
 		top=len(self.grid);
 		left=len(self.grid[0]);
@@ -506,14 +506,14 @@ class Park:
 				j+=1;
 			i+=1;
 
-		if (debug_print): print gh1,"+",gh2,"=",top,left,bottom,right;
+		if (debug_print): print gh1, "+", gh2, "=", top, left, bottom, right;
 
 		# the new greenhouse is named <gh1>_.  Fill in
 		# the squares with the new combined house.
 		# remove the original house
 		newhouse=gh1+'_';
-		for i in range(top,bottom+1):
-			for j in range(left,right+1):
+		for i in range(top, bottom+1):
+			for j in range(left, right+1):
 				res.grid[i][j].append(newhouse);
 
 		res.deleteHouse(gh1);
@@ -526,7 +526,7 @@ class Park:
 
 		return new_parks;
 		
-	def reduce(self,newhouse):
+	def reduce(self, newhouse):
 		#
 		# REDUCE
 		# resolve squares that have overlapping houses
@@ -550,9 +550,9 @@ class Park:
 			assert(s!=newhouse);
 
 			curcoord = self.getHouseCoors(s);
-			if (debug_print): print s,curcoord,"overlaps",newhouse,nhcoord;
-			(cur_t,cur_l,cur_b,cur_r) = curcoord;
-			(new_t,new_l,new_b,new_r) = nhcoord;
+			if (debug_print): print s, curcoord, "overlaps", newhouse, nhcoord;
+			(cur_t, cur_l, cur_b, cur_r) = curcoord;
+			(new_t, new_l, new_b, new_r) = nhcoord;
 
 			# easiest case: old house is completely
 			# contained within the new.  old can simply
@@ -575,15 +575,15 @@ class Park:
 			): #{
 				if (cur_l>=new_l and cur_l<=new_r):
 					if (debug_print): print "TRUNC (left)";
-					for i in range(cur_t,cur_b+1):
-						for j in range(cur_l,new_r+1):
+					for i in range(cur_t, cur_b+1):
+						for j in range(cur_l, new_r+1):
 							self.grid[i][j].removeHouseFromCell(s);
 					continue;
 
 				if (cur_r<=new_r and cur_r>=new_l):
 					if (debug_print): print "TRUNC (right)";
-					for i in range(cur_t,cur_b+1):
-						for j in range(new_l,cur_r+1):
+					for i in range(cur_t, cur_b+1):
+						for j in range(new_l, cur_r+1):
 							self.grid[i][j].removeHouseFromCell(s);
 					continue;
 			#}
@@ -594,15 +594,15 @@ class Park:
 			): #{
 				if (cur_b<=new_b and cur_b>=new_t):
 					if (debug_print): print "TRUNC (bottom)";
-					for i in range(new_t,cur_b+1):
-						for j in range(cur_l,cur_r+1):
+					for i in range(new_t, cur_b+1):
+						for j in range(cur_l, cur_r+1):
 							self.grid[i][j].removeHouseFromCell(s);
 					continue;
 
 				if (cur_t>=new_t and cur_t<=new_b):
 					if (debug_print): print "TRUNC (top)";
-					for i in range(cur_t,new_b+1):
-						for j in range(cur_l,cur_r+1):
+					for i in range(cur_t, new_b+1):
+						for j in range(cur_l, cur_r+1):
 							self.grid[i][j].removeHouseFromCell(s);
 					continue;
 			#}
@@ -618,13 +618,13 @@ class Park:
 				if (debug_print): print "SPLIT (horizontal)";
 
 				# new left side
-				for i in range(cur_t,cur_b+1):
-					for j in range(cur_l,new_l):
+				for i in range(cur_t, cur_b+1):
+					for j in range(cur_l, new_l):
 						self.grid[i][j].occ_list.append(s+"y");
 
 				# new right side
-				for i in range(cur_t,cur_b+1):
-					for j in range(new_r+1,cur_r+1):
+				for i in range(cur_t, cur_b+1):
+					for j in range(new_r+1, cur_r+1):
 						self.grid[i][j].occ_list.append(s+"z");
 
 				if (debug_print): self.display();
@@ -641,13 +641,13 @@ class Park:
 				if (debug_print): print "SPLIT (vertical)";
 
 				# new top side
-				for i in range(cur_t,new_t):
-					for j in range(cur_l,cur_r+1):
+				for i in range(cur_t, new_t):
+					for j in range(cur_l, cur_r+1):
 						self.grid[i][j].occ_list.append(s+"y");
 
 				# new bottom
-				for i in range(new_b+1,cur_b+1):
-					for j in range(cur_l,cur_r+1):
+				for i in range(new_b+1, cur_b+1):
+					for j in range(cur_l, cur_r+1):
 						self.grid[i][j].occ_list.append(s+"z");
 
 				if (debug_print): self.display();
@@ -657,7 +657,7 @@ class Park:
 
 			# the really hard case: one corner of the
 			# house is conflicting.
-			p=Park(self.rows,self.cols);
+			p=Park(self.rows, self.cols);
 			p.copyFrom(self);
 			if (
 				(cur_l<new_l) and
@@ -666,8 +666,8 @@ class Park:
 				(cur_b>=new_t)
 			):
 				if (debug_print): print "SPLIT (bottom-right corner)";
-				self.splitAndRemove(s,1,1);
-				p.splitAndRemove(s,2,1);
+				self.splitAndRemove(s, 1, 1);
+				p.splitAndRemove(s, 2, 1);
 				p.reduce(newhouse);
 				reduce_result.append(p);
 				continue;
@@ -679,8 +679,8 @@ class Park:
 				(cur_r>=new_l)
 			):
 				if (debug_print): print "SPLIT (top-right corner)";
-				self.splitAndRemove(s,1,2);
-				p.splitAndRemove(s,2,2);
+				self.splitAndRemove(s, 1, 2);
+				p.splitAndRemove(s, 2, 2);
 				p.reduce(newhouse);
 				reduce_result.append(p);
 				continue;
@@ -692,8 +692,8 @@ class Park:
 				(cur_r>new_r)
 			):
 				if (debug_print): print "SPLIT (bottom-left corner)";
-				self.splitAndRemove(s,1,3);
-				p.splitAndRemove(s,2,3);
+				self.splitAndRemove(s, 1, 3);
+				p.splitAndRemove(s, 2, 3);
 				p.reduce(newhouse);
 				reduce_result.append(p);
 				continue;
@@ -705,8 +705,8 @@ class Park:
 				(cur_r>new_r)
 			):
 				if (debug_print): print "SPLIT (top-left corner)";
-				self.splitAndRemove(s,1,4);
-				p.splitAndRemove(s,2,4);
+				self.splitAndRemove(s, 1, 4);
+				p.splitAndRemove(s, 2, 4);
 				p.reduce(newhouse);
 				reduce_result.append(p);
 				continue;
@@ -754,7 +754,7 @@ class Park:
 # at without starting from the minimal state of 1x1 greenhouses.
 
 class InputProcessor:
-	def __init__(self,max_array,data_array):
+	def __init__(self, max_array, data_array):
 		# FIXME: this should not take multiple problems at once
 		self.max_array = max_array;
 		self.data_array = data_array;
@@ -769,9 +769,9 @@ class InputProcessor:
 			cols=len(self.data_array[grid_index][0]);
 
 			if (debug_print):
-				print("creating new park with (rows,cols) = ({0},{1})".
-				      format(rows,cols));
-			p=Park(rows,cols);
+				print("creating new park with (rows, cols) = ({0}, {1})".
+				      format(rows, cols));
+			p=Park(rows, cols);
 
 			# load the park object with the input data
 			# i.e. the location of the strawberries
@@ -819,8 +819,8 @@ class InputProcessor:
 				cur_price = p.totalPrice();
 				if (debug_print): print "*****************";
 				if (debug_print): p.display();
-				if (debug_print): print "CUR: # of houses:",cur_num_houses;
-				if (debug_print): print "CUR: price:",cur_price;
+				if (debug_print): print "CUR: # of houses:", cur_num_houses;
+				if (debug_print): print "CUR: price:", cur_price;
 
 				# generate list of greenhouses to combine
 				# NOTE: the loop only does MAX_COMBINES number of
@@ -842,12 +842,12 @@ class InputProcessor:
 
 					i+=1;
 
-					(gh1,gh2) = cmb;
+					(gh1, gh2) = cmb;
 
 					# take the union of two greenhouses, and then
 					# reduce (subtract from) all other greenhouses
 					# except the two we just combined
-					new_park_list=p.combineAndReduce(gh1,gh2);
+					new_park_list=p.combineAndReduce(gh1, gh2);
 
 					for np in new_park_list: #{
 						num_houses = len(np.allHouseNames());
@@ -856,9 +856,9 @@ class InputProcessor:
 						variation=num_houses-cur_num_houses;
 
 						if (debug_print):
-							print "# of houses:",num_houses;
-							print "price:",price;
-							print "house count variation:",variation;
+							print "# of houses:", num_houses;
+							print "price:", price;
+							print "house count variation:", variation;
 
 						# if the number of greenhouses went down, and
 						# we have too many in the current one, then
@@ -907,8 +907,8 @@ class InputProcessor:
 				#}
 
 				if (debug_print):
-					print "min_var",min_variation;
-					print "min_price",min_price;
+					print "min_var", min_variation;
+					print "min_price", min_price;
 
 				print("Selecting best price of {0} configurations".
 				      format(len(selected)));
@@ -988,7 +988,7 @@ class InputProcessor:
 			else: #{
 				retry-=1;
 				print("can't beat previous best of {0}, retries {1}".
-				      format(best_overall.totalPrice(),retry));
+				      format(best_overall.totalPrice(), retry));
 			#}
 
 			if (retry<=0): done=True;
@@ -1005,8 +1005,8 @@ reader = InputReader();
 
 # TODO: this should probably read each count+grid input
 # individually, and process each as we go along.
-(max_ar,data_ar) = reader.readInput();
-proc = InputProcessor(max_ar,data_ar);
+(max_ar, data_ar) = reader.readInput();
+proc = InputProcessor(max_ar, data_ar);
 
 proc.do_run();
 
