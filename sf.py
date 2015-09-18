@@ -143,6 +143,11 @@ class ParkSquare:
 			# conflict
 			return "X";
 
+	def removeHouseFromCell(self, hname):
+		self.occ_list.remove(hname);
+		assert(not (len(self.occ_list)==0 and
+		            self.grid[i][j].has_berry));
+
 class Park:
 	'''
 		represents a park
@@ -571,20 +576,14 @@ class Park:
 					if (debug_print): print "TRUNC (left)";
 					for i in range(cur_t,cur_b+1):
 						for j in range(cur_l,new_r+1):
-							# TODO: add removeHouseFromCell
-							self.grid[i][j].occ_list.remove(s);
-							assert(not (len(self.grid[i][j].occ_list)==0 and
-										self.grid[i][j].has_berry));
+							self.grid[i][j].removeHouseFromCell(s);
 					continue;
 
 				if (cur_r<=new_r and cur_r>=new_l):
 					if (debug_print): print "TRUNC (right)";
 					for i in range(cur_t,cur_b+1):
 						for j in range(new_l,cur_r+1):
-							# TODO: add removeHouseFromCell
-							self.grid[i][j].occ_list.remove(s);
-							assert(not (len(self.grid[i][j].occ_list)==0 and
-										self.grid[i][j].has_berry));
+							self.grid[i][j].removeHouseFromCell(s);
 					continue;
 			#}
 
@@ -596,20 +595,14 @@ class Park:
 					if (debug_print): print "TRUNC (bottom)";
 					for i in range(new_t,cur_b+1):
 						for j in range(cur_l,cur_r+1):
-							# TODO: add removeHouseFromCell
-							self.grid[i][j].occ_list.remove(s);
-							assert(not (len(self.grid[i][j].occ_list)==0 and
-										self.grid[i][j].has_berry));
+							self.grid[i][j].removeHouseFromCell(s);
 					continue;
 
 				if (cur_t>=new_t and cur_t<=new_b):
 					if (debug_print): print "TRUNC (top)";
 					for i in range(cur_t,new_b+1):
 						for j in range(cur_l,cur_r+1):
-							# TODO: add removeHouseFromCell
-							self.grid[i][j].occ_list.remove(s);
-							assert(not (len(self.grid[i][j].occ_list)==0 and
-										self.grid[i][j].has_berry));
+							self.grid[i][j].removeHouseFromCell(s);
 					continue;
 			#}
 
