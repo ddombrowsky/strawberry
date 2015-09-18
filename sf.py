@@ -533,10 +533,16 @@ class Park:
 			j=0;
 			for cell in row:
 				if (len(cell.occ_list)>1):
-					conflict[cell.occ_list[0]]=1;
+					for hname in cell.occ_list:
+						if (hname!=newhouse):
+							conflict[hname]=1;
 
 		nhcoord = self.getHouseCoors(newhouse);
 		for s in conflict.iterkeys():
+
+			# the new house should never be removed
+			assert(s!=newhouse);
+
 			curcoord = self.getHouseCoors(s);
 			if (debug_print): print s,curcoord,"overlaps",newhouse,nhcoord;
 			(cur_t,cur_l,cur_b,cur_r) = curcoord;
