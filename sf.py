@@ -567,18 +567,24 @@ class Park:
 				(cur_t>=new_t) and
 				(cur_b<=new_b)
 			): #{
-				if (cur_l>=new_l):
+				if (cur_l>=new_l and cur_l<=new_r):
 					if (debug_print): print "TRUNC (left)";
 					for i in range(cur_t,cur_b+1):
 						for j in range(cur_l,new_r+1):
+							# TODO: add removeHouseFromCell
 							self.grid[i][j].occ_list.remove(s);
+							assert(not (len(self.grid[i][j].occ_list)==0 and
+										self.grid[i][j].has_berry));
 					continue;
 
-				if (cur_r<=new_r):
+				if (cur_r<=new_r and cur_r>=new_l):
 					if (debug_print): print "TRUNC (right)";
 					for i in range(cur_t,cur_b+1):
 						for j in range(new_l,cur_r+1):
+							# TODO: add removeHouseFromCell
 							self.grid[i][j].occ_list.remove(s);
+							assert(not (len(self.grid[i][j].occ_list)==0 and
+										self.grid[i][j].has_berry));
 					continue;
 			#}
 
@@ -586,18 +592,24 @@ class Park:
 				(cur_l>=new_l) and
 				(cur_r<=new_r)
 			): #{
-				if (cur_t<=new_t):
+				if (cur_b<=new_b and cur_b>=new_t):
 					if (debug_print): print "TRUNC (bottom)";
 					for i in range(new_t,cur_b+1):
 						for j in range(cur_l,cur_r+1):
+							# TODO: add removeHouseFromCell
 							self.grid[i][j].occ_list.remove(s);
+							assert(not (len(self.grid[i][j].occ_list)==0 and
+										self.grid[i][j].has_berry));
 					continue;
 
-				if (cur_b>=new_b):
+				if (cur_t>=new_t and cur_t<=new_b):
 					if (debug_print): print "TRUNC (top)";
 					for i in range(cur_t,new_b+1):
 						for j in range(cur_l,cur_r+1):
+							# TODO: add removeHouseFromCell
 							self.grid[i][j].occ_list.remove(s);
+							assert(not (len(self.grid[i][j].occ_list)==0 and
+										self.grid[i][j].has_berry));
 					continue;
 			#}
 
