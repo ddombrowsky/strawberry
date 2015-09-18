@@ -284,10 +284,10 @@ class Park:
 		conf_l=cur_r;
 		conf_b=cur_t;
 		conf_r=cur_l;
+
 		for i in range(cur_t,cur_b+1):
 			for j in range(cur_l,cur_r+1):
-				self.grid[i][j].occ_list.remove(hname);
-				if (len(self.grid[i][j].occ_list)>0):
+				if (len(self.grid[i][j].occ_list)>1):
 					# store the conflicting coordinates
 					if (i<conf_t): conf_t=i;
 					if (j<conf_l): conf_l=j;
@@ -389,16 +389,25 @@ class Park:
 			sys.exit(-1);
 
 
-		# finally, create the two new houses
+		# create the two new houses
 		for n in range(2):
+			if (debug_print):
+				print("New house, {0},{1} to {2},{3}".
+				      format(new_t[n],new_l[n],new_b[n]+1,new_r[n]+1));
+
 			for i in range(new_t[n],new_b[n]+1):
 				for j in range(new_l[n],new_r[n]+1):
-					if (len(self.grid[i][j].occ_list)>0):
+					if (len(self.grid[i][j].occ_list)>1):
 						sys.stderr.write("ERROR: attempting to add conflict\n");
 						sys.exit(-1);
 					self.grid[i][j].occ_list.append(sname[n]);
 
+		# remove the original
+		if (debug_print):
+			print("Removing house {0}".format(hname));
+			self.display()
 
+		self.deleteHouse(hname);
 
 
 	def combineAndReduce(self,gh1,gh2):
