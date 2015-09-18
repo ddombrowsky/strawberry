@@ -19,42 +19,29 @@ MAX_COMBINES=1000; # num of combinations to try each round
 MAX_RETRIES=10; # number of times try to beat the best solution
 
 class InputReader:
-	def __init__(self):
-		self.ar_data = [];
-		self.ar_max_greenhouses = [];
-
 	def readInput(self):
 		num=0;
 		grid = [];
-
-		def procgrid(max, num, grid): #{
-
-			if (debug_print): print "max greenhouses:", max, ", grid #", num;
-
-			if (len(grid)>0):
-				self.ar_data.append(grid);
-				if (debug_print): print "\n".join(grid);
-				num+=1;
-
-			return num;
-		#}
+		ar_data = [];
+		max_greenhouses = -1;
 
 		state=0;
-		got_eof=False;
+		done=False;
 
-		while (not got_eof): #{
+		while (not done): #{
 			if (state==0):
 				print "Input max # of greenhouses: ",;
 
 			r=sys.stdin.readline();
 
 			if (len(r)==0):
-				got_eof=True;
+				done=True;
 				continue;
 
 			r=r.rstrip(); # remove newline
 
-			if (len(r)>0): # skip blank lines
+			if (len(r)>0):
+				# process a line
 				rm=re.match('[0-9]+', r);
 				if (rm is None):
 					if (state==0):
@@ -64,15 +51,11 @@ class InputReader:
 					grid.append(r);
 				else:
 					if (state==1):
-						# got a new number before a blank
-						# line.  Handled by resetting the state
+						# Got a new number before a blank
+						# line.  Cannot continue.
 						state=0;
-						num=procgrid(
-							self.ar_max_greenhouses[len(self.ar_max_greenhouses)-1],
-							num,
-							grid
-						);
 						grid=[];
+						done=True;
 
 					r=int(r);
 
@@ -82,29 +65,15 @@ class InputReader:
 						continue;
 
 					# store the max # of greenhouses
-					self.ar_max_greenhouses.append(r);
+					max_greenhouses=r;
 					state=1;
 			else:
-				# blank line will reset to initial state
+				# blank line indicates end of block
+				done=True;
 				state=0;
-				num=procgrid(
-					self.ar_max_greenhouses[len(self.ar_max_greenhouses)-1],
-					num,
-					grid
-				);
-				grid=[];
 		#}
 
-		# if we get EOF before a blank line, don't forget the last grid
-		if (state==1): #{
-			procgrid(
-				self.ar_max_greenhouses[len(self.ar_max_greenhouses)-1],
-				num,
-				grid
-			);
-		#}
-
-		return (self.ar_max_greenhouses, self.ar_data);
+		return (max_greenhouses, grid);
 
 class ParkSquare:
 	'''
@@ -754,208 +723,206 @@ class Park:
 # at without starting from the minimal state of 1x1 greenhouses.
 
 class InputProcessor:
-	def __init__(self, max_array, data_array):
+	def __init__(self, max_gh, field_data):
 		# FIXME: this should not take multiple problems at once
-		self.max_array = max_array;
-		self.data_array = data_array;
+		self.max_gh_count = max_gh;
+		self.field_data = field_data;
 		self.best = None;
 
 	def do_single_run(self):
 		print "\n";
-		grid_index=0;
 		p=None;
-		for max_gh_count in self.max_array: #{
-			rows=len(self.data_array[grid_index]);
-			cols=len(self.data_array[grid_index][0]);
 
-			if (debug_print):
-				print("creating new park with (rows, cols) = ({0}, {1})".
-				      format(rows, cols));
-			p=Park(rows, cols);
+		rows=len(self.field_data);
+		cols=len(self.field_data[0]);
 
-			# load the park object with the input data
-			# i.e. the location of the strawberries
-			j=0;
-			for row in self.data_array[grid_index]:
-				k=0;
-				for c in row:
-					if (c=='@'):
-						p.grid[j][k].has_berry = True;
-					k+=1;
-				j+=1;
+		if (debug_print):
+			print("creating new park with (rows, cols) = ({0}, {1})".
+				  format(rows, cols));
+		p=Park(rows, cols);
 
-			# display the park, per the test requirements
-			print max_gh_count;
-			p.display();
-			print;
+		# load the park object with the input data
+		# i.e. the location of the strawberries
+		j=0;
+		for row in self.field_data:
+			k=0;
+			for c in row:
+				if (c=='@'):
+					p.grid[j][k].has_berry = True;
+				k+=1;
+			j+=1;
 
-			# INITIAL PARK:
-			#
-			# convert all strawberries to 1x1 greenhouses
-			j=0;
-			gh_num=0;
-			for row in self.data_array[grid_index]: #{
-				k=0;
-				for c in row: #{
-					if (p.grid[j][k].has_berry): #{
-						p.grid[j][k].occ_list.append("{0}".format(gh_num));
-						gh_num+=1;
-					#}
-					k+=1;
+		# display the park, per the test requirements
+		print self.max_gh_count;
+		p.display();
+		print;
+
+		# INITIAL PARK:
+		#
+		# convert all strawberries to 1x1 greenhouses
+		j=0;
+		gh_num=0;
+		for row in self.field_data: #{
+			k=0;
+			for c in row: #{
+				if (p.grid[j][k].has_berry): #{
+					p.grid[j][k].occ_list.append("{0}".format(gh_num));
+					gh_num+=1;
 				#}
-				j+=1;
+				k+=1;
 			#}
+			j+=1;
+		#}
 
+		if (debug_print): p.display();
+
+		solution_found=False;
+		round=0;
+		while (not solution_found): #{
+			round+=1;
+
+			print("Starting round {0}".format(round));
+
+			cur_num_houses = len(p.allHouseNames());
+			cur_price = p.totalPrice();
+			if (debug_print): print "*****************";
 			if (debug_print): p.display();
+			if (debug_print): print "CUR: # of houses:", cur_num_houses;
+			if (debug_print): print "CUR: price:", cur_price;
 
-			solution_found=False;
-			round=0;
-			while (not solution_found):
-				round+=1;
+			# generate list of greenhouses to combine
+			# NOTE: the loop only does MAX_COMBINES number of
+			# combinations in this list
+			clist = p.randomizeComboList();
+			i=0;
+			selected=[];
 
-				print("Starting round {0}".format(round));
+			min_variation=sys.maxint;
+			min_price=sys.maxint;
+			min_price_l=[];
 
-				cur_num_houses = len(p.allHouseNames());
-				cur_price = p.totalPrice();
-				if (debug_print): print "*****************";
-				if (debug_print): p.display();
-				if (debug_print): print "CUR: # of houses:", cur_num_houses;
-				if (debug_print): print "CUR: price:", cur_price;
-
-				# generate list of greenhouses to combine
-				# NOTE: the loop only does MAX_COMBINES number of
-				# combinations in this list
-				clist = p.randomizeComboList();
-				i=0;
-				selected=[];
-
-				min_variation=sys.maxint;
-				min_price=sys.maxint;
-				min_price_l=[];
-
-				for cmb in clist: #{
-					if (i>=MAX_COMBINES): break;
-
-					if (debug_print):
-						sys.stdout.write("\ntesting combination #{0}\n".
-						                 format(i));
-
-					i+=1;
-
-					(gh1, gh2) = cmb;
-
-					# take the union of two greenhouses, and then
-					# reduce (subtract from) all other greenhouses
-					# except the two we just combined
-					new_park_list=p.combineAndReduce(gh1, gh2);
-
-					for np in new_park_list: #{
-						num_houses = len(np.allHouseNames());
-						price = np.totalPrice();
-
-						variation=num_houses-cur_num_houses;
-
-						if (debug_print):
-							print "# of houses:", num_houses;
-							print "price:", price;
-							print "house count variation:", variation;
-
-						# if the number of greenhouses went down, and
-						# we have too many in the current one, then
-						# select only if variation is -1.  otherwise,
-						# take the one with the smallest absolute
-						# variation.
-						if (cur_num_houses>max_gh_count): #{
-							if (variation==-1):
-								selected.append(np);
-							else: #{
-								v=abs(variation);
-
-								# variation of 0 and 1 are considered equal
-								if (v==0): v=1;
-
-								if (v<min_variation):
-									# found a new minimum, blank
-									# the list and start over
-									selected=[];
-									selected.append(np);
-									min_variation=v;
-								elif (v==min_variation):
-									selected.append(np);
-							#}
-						else:
-							# We're at or below the max number of
-							# houses.  Keep this configuration
-							# by default.
-							selected.append(np);
-						#}
-
-						# In later rounds, also select those with
-						# the lowest price.  If we included this
-						# in early rounds, it would most often select
-						# one house over all berries and iteration
-						# would stop.
-						if (round>10): #{
-							if (price<min_price):
-								min_price_l=[];
-								min_price_l.append(np);
-								min_price=price;
-							elif (price==min_price):
-								min_price_l.append(np);
-						#}
-					#}
-				#}
+			for cmb in clist: #{
+				if (i>=MAX_COMBINES): break;
 
 				if (debug_print):
-					print "min_var", min_variation;
-					print "min_price", min_price;
+					sys.stdout.write("\ntesting combination #{0}\n".
+									 format(i));
 
-				print("Selecting best price of {0} configurations".
-				      format(len(selected)));
+				i+=1;
 
-				# append the min_price list to the selected list.
-				# This will weight lower prices higher in probability.
-				selected.extend(min_price_l);
+				(gh1, gh2) = cmb;
 
-				assert(len(selected) > 0);
+				# take the union of two greenhouses, and then
+				# reduce (subtract from) all other greenhouses
+				# except the two we just combined
+				new_park_list=p.combineAndReduce(gh1, gh2);
 
-				# pick the next candidate from the selection list
-				# with the lowest price
-				selidx=-1;
-				min_price=sys.maxint;
-				for i in range(len(selected)):
-					if (selected[i].totalPrice()<min_price): selidx=i;
+				for np in new_park_list: #{
+					num_houses = len(np.allHouseNames());
+					price = np.totalPrice();
 
-				candidate=selected[selidx];
-				num_houses=len(candidate.allHouseNames());
-				price=candidate.totalPrice();
+					variation=num_houses-cur_num_houses;
 
-				# if we need to reduce houses, then choose
-				# it and goto next round
-				if (
-					(cur_num_houses>max_gh_count) and
-					(num_houses<cur_num_houses)
-				):
-					p=candidate;
-				elif (
-					(cur_price>price) or
-					((cur_price==price) and (num_houses<cur_num_houses))
-				):
-					p=candidate;
-				else:
-					# optimized park cannot beat current park, so
-					# we select the current as the solution
-					solution_found=True;
+					if (debug_print):
+						print "# of houses:", num_houses;
+						print "price:", price;
+						print "house count variation:", variation;
+
+					# if the number of greenhouses went down, and
+					# we have too many in the current one, then
+					# select only if variation is -1.  otherwise,
+					# take the one with the smallest absolute
+					# variation.
+					if (cur_num_houses>self.max_gh_count): #{
+						if (variation==-1):
+							selected.append(np);
+						else: #{
+							v=abs(variation);
+
+							# variation of 0 and 1 are considered equal
+							if (v==0): v=1;
+
+							if (v<min_variation):
+								# found a new minimum, blank
+								# the list and start over
+								selected=[];
+								selected.append(np);
+								min_variation=v;
+							elif (v==min_variation):
+								selected.append(np);
+						#}
+					else:
+						# We're at or below the max number of
+						# houses.  Keep this configuration
+						# by default.
+						selected.append(np);
+					#}
+
+					# In later rounds, also select those with
+					# the lowest price.  If we included this
+					# in early rounds, it would most often select
+					# one house over all berries and iteration
+					# would stop.
+					if (round>10): #{
+						if (price<min_price):
+							min_price_l=[];
+							min_price_l.append(np);
+							min_price=price;
+						elif (price==min_price):
+							min_price_l.append(np);
+					#}
+				#}
+			#}
 
 			if (debug_print):
-				sys.stdout.write("\n\nprocessing finished in round {0}\n".
-				                 format(round));
-				print "SOLUTION:";
-			print p.totalPrice();
-			p.display();
+				print "min_var", min_variation;
+				print "min_price", min_price;
 
-			grid_index+=1;
+			print("Selecting best price of {0} configurations".
+				  format(len(selected)));
+
+			# append the min_price list to the selected list.
+			# This will weight lower prices higher in probability.
+			selected.extend(min_price_l);
+
+			assert(len(selected) > 0);
+
+			# pick the next candidate from the selection list
+			# with the lowest price
+			selidx=-1;
+			min_price=sys.maxint;
+			for i in range(len(selected)):
+				if (selected[i].totalPrice()<min_price): selidx=i;
+
+			candidate=selected[selidx];
+			num_houses=len(candidate.allHouseNames());
+			price=candidate.totalPrice();
+
+			# if we need to reduce houses, then choose
+			# it and goto next round
+			if (
+				(cur_num_houses>self.max_gh_count) and
+				(num_houses<cur_num_houses)
+			):
+				p=candidate;
+			elif (
+				(cur_price>price) or
+				((cur_price==price) and (num_houses<cur_num_houses))
+			):
+				p=candidate;
+			else:
+				# optimized park cannot beat current park, so
+				# we select the current as the solution
+				solution_found=True;
 		#}
+
+		if (debug_print):
+			sys.stdout.write("\n\nprocessing finished in round {0}\n".
+							 format(round));
+			print "SOLUTION:";
+
+		print p.totalPrice();
+		p.display();
 
 		self.best = p;
 		print "done";
@@ -1005,9 +972,16 @@ reader = InputReader();
 
 # TODO: this should probably read each count+grid input
 # individually, and process each as we go along.
-(max_ar, data_ar) = reader.readInput();
-proc = InputProcessor(max_ar, data_ar);
-
-proc.do_run();
+done=False;
+while (not done):
+	(houses, data_ar) = reader.readInput();
+	if (len(data_ar)>0):
+		print("\n\n\n**** New problem: max houses {0}, rows {1}, cols {2}".
+		      format(houses, len(data_ar), len(data_ar[0])));
+		proc = InputProcessor(houses, data_ar);
+		proc.do_run();
+	else:
+		print("\n\n**** finished!");
+		done=True;
 
 # vim:ts=4:noet
