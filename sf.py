@@ -240,6 +240,8 @@ class Park:
 				if (len(self.grid[i][j].occ_list)>0):
 					if (self.grid[i][j].occ_list.count(hname)>0):
 						self.grid[i][j].occ_list.remove(hname);
+						assert(not (len(self.grid[i][j].occ_list)==0 and
+									self.grid[i][j].has_berry));
 
 	def allHouseNames(self):
 		res=dict();
