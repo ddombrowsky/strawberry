@@ -300,26 +300,42 @@ class Park:
 		# by the conflicting house, place one
 		# of two new houses based on the split type
 		# and the conflicting corner
-		new_t=[2,(0,0)];
-		new_l=[2,(0,0)];
-		new_b=[2,(0,0)];
-		new_r=[2,(0,0)];
+		new_t=[0,0];
+		new_l=[0,0];
+		new_b=[0,0];
+		new_r=[0,0];
 		if (con_corner==1):
+			# A is existing (to be split), B is new
+
 			# 1 = bottom-right corner
 			if (split_type==1):
+				#
+				# AAA      CCC
+				# AAXBB -> DDBBB
+				#   BBB      BBB
+				#
+				# C:
 				new_t[0]=cur_t;
 				new_l[0]=cur_l;
 				new_b[0]=conf_t-1;
 				new_r[0]=cur_r;
+				# D:
 				new_t[1]=conf_t;
 				new_l[1]=cur_l;
 				new_b[1]=cur_b;
 				new_r[1]=conf_l-1;
 			else:
+				#
+				# AAA      CCD
+				# AAXBB -> CCBBB
+				#   BBB      BBB
+				#
+				# C:
 				new_t[0]=cur_t;
 				new_l[0]=cur_l;
 				new_b[0]=cur_b;
 				new_r[0]=conf_l-1;
+				# D:
 				new_t[1]=cur_t;
 				new_l[1]=conf_l;
 				new_b[1]=conf_t-1;
@@ -327,47 +343,80 @@ class Park:
 		elif (con_corner==2):
 			# 2 = top-right corner
 			if (split_type==1):
+				#
+				#   BBB      BBB
+				# AAXBB -> CCBBB
+				# AAA      DDD
+				#
+				# C:
 				new_t[0]=cur_t;
 				new_l[0]=cur_l;
 				new_b[0]=conf_b;
 				new_r[0]=conf_l-1;
+				# D:
 				new_t[1]=conf_b+1;
 				new_l[1]=cur_l;
 				new_b[1]=cur_b;
 				new_r[1]=cur_r;
 			else:
+				#
+				#   BBB      BBB
+				# AAXBB -> CCBBB
+				# AAA      CCD
+				#
+				# C:
 				new_t[0]=cur_t;
 				new_l[0]=cur_l;
 				new_b[0]=cur_b;
 				new_r[0]=conf_l-1;
+				# D:
 				new_t[1]=conf_b+1;
 				new_l[1]=conf_l;
 				new_b[1]=cur_b;
-				new_r[1]=cur_l;
+				new_r[1]=cur_r;
 		elif (con_corner==3):
 			# 3 = bottom-left corner
 			if (split_type==1):
+				#
+				#   AAA      CCC
+				# BBXAA -> BBBDD
+				# BBB      BBB
+				#
+				# C:
 				new_t[0]=cur_t;
 				new_l[0]=cur_l;
 				new_b[0]=conf_t-1;
 				new_r[0]=cur_r;
+				# D:
 				new_t[1]=conf_t;
 				new_l[1]=conf_r+1;
 				new_b[1]=cur_b;
 				new_r[1]=cur_r;
 			else:
+				#
+				#   AAA      CDD
+				# BBXAA -> BBBDD
+				# BBB      BBB
+				#
+				# C:
 				new_t[0]=cur_t;
 				new_l[0]=cur_l;
 				new_b[0]=conf_t-1;
-				new_r[0]=cur_r;
-				new_t[1]=conf_t;
+				new_r[0]=conf_r;
+				# D:
+				new_t[1]=cur_t;
 				new_l[1]=conf_r+1;
 				new_b[1]=cur_b;
 				new_r[1]=cur_r;
 		elif (con_corner==4):
 			# 4 = top-left corner
 			if (split_type==1):
-				new_t[0]=conf_t;
+				#
+				# BBB      BBB
+				# BBXAA -> BBBCC
+				#   AAA      DDD
+				#
+				new_t[0]=cur_t;
 				new_l[0]=conf_r+1;
 				new_b[0]=conf_b;
 				new_r[0]=cur_r;
@@ -376,6 +425,11 @@ class Park:
 				new_b[1]=cur_b;
 				new_r[1]=cur_r;
 			else:
+				#
+				# BBB      BBB
+				# BBXAA -> BBBCC
+				#   AAA      DCC
+				#
 				new_t[0]=cur_t;
 				new_l[0]=conf_r+1;
 				new_b[0]=cur_b;
